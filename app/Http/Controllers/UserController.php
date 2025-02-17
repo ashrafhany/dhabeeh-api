@@ -42,7 +42,14 @@ class UserController extends Controller
         $validatedData = $request->validate([
             'first_name' => 'sometimes|string|max:255',
             'last_name'  => 'sometimes|string|max:255',
-            //'phone'      => 'sometimes|string|max:20',
+            'phone'      => [
+                'sometimes',
+                'string',
+                'min:10',
+                'max:13',
+                Rule::unique('users')->ignore($user->id), // استثناء المستخدم الحالي
+            ],
+
             'address'    => 'sometimes|string|max:255',
             'language'   => 'sometimes|string|in:ar,en',
         ]);

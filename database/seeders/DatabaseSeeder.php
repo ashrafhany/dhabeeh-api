@@ -1,7 +1,7 @@
 <?php
 
 namespace Database\Seeders;
-
+use Spatie\Permission\Models\Permission;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -14,29 +14,31 @@ class DatabaseSeeder extends Seeder
      * @return void
      */
     public function run()
-    {
-        /*
-         // تحقق مما إذا كان الدور موجودًا قبل إنشائه
-    //if (!Role::where('name', 'admin')->exists()) {
-        //Role::create(['name' => 'admin']);
-    // تحقق مما إذا كان الدور موجودًا قبل إنشائه
-    //if (!Role::where('name', 'admin')->exists()) {
-        //Role::create(['name' => 'admin']);
-    //}
-    // إنشاء الأدوار
-    //$adminRole = Role::create(['name' => 'admin']);
-    //$userRole = Role::create(['name' => 'user']);
+{
+    // التحقق من وجود الأدوار قبل إنشائها
+    $adminRole = Role::firstOrCreate(['name' => 'admin']);
+    $userRole = Role::firstOrCreate(['name' => 'user']);
 
-    // إنشاء مستخدم إداري وإعطاؤه دور Admin
-    $admin = User::create([
-        'first_name' => 'Admin',
-        'last_name' => 'User',
-        'email' => 'admin@example.com',
-        'phone' => '123456789',
-        'password' => bcrypt('123456789'),
-    ]);
-    $admin->assignRole($adminRole);
-    */
+    // التحقق من وجود الصلاحيات قبل إضافتها
+    $permissions = [
+        'manage orders',
+        'manage users',
+        'manage products'
+    ];
+
+    foreach ($permissions as $permission) {
+        Permission::firstOrCreate(['name' => $permission]);
     }
 
+    // ربط الصلاحيات بالأدوار
+    $adminRole->syncPermissions($permissions);
+    $userRole->syncPermissions(['manage orders']);
+
+    // تعيين دور "admin" لأول مستخدم في قاعدة البيانات
+    $user = User::first();
+    if ($user && !$user->hasRole('admin')) {
+        $user->assignRole('admin');
+        echo "تم تعيين الدور Admin للمستخدم: " . $user->first_name . " " . $user->last_name . "\n";
+    }
+}
 }

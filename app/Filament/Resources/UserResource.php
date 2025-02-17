@@ -38,8 +38,20 @@ class UserResource extends Resource
                 TextInput::make('email')
                     ->label('البريد الإلكتروني')
                     ->required()
-                    ->email()
+                    ->email(),
+                TextInput::make('address')
+                    ->label('العنوان')
+                    ->required()
+                    ->maxLength(255),
+                TextInput::make('phone')
+                    ->label('رقم التليفون')
+                    ->required()
+                    ->maxLength(255)
                     ->unique(),
+                TextInput::make('password')
+                    ->label('كلمة السر')
+                    ->maxLength(255)
+                    ->nullable(),
                 TextInput::make('created_at')
                     ->label('تاريخ الإنشاء')
                     ->disabled(),
@@ -60,6 +72,14 @@ class UserResource extends Resource
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('تاريخ الإنشاء')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('address')
+                    ->label('العنوان')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('phone')
+                    ->label('رقم التليفون')
                     ->searchable()
                     ->sortable(),
             ])
