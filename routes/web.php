@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+//use Filament\Facades\Filament;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,5 +15,5 @@ use Illuminate\Support\Facades\Route;
 //Filament::routes();
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect('/admin/login');
 });
