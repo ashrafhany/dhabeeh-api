@@ -15,9 +15,12 @@ class Product extends Model
     'price',
     'category_id',
     'weight',
-    'stock'
+    'stock',
+    'options'
     ];
-
+    protected $casts = [
+        'options' => 'array' // ✅ تحويل البيانات تلقائيًا من JSON إلى Array
+    ];
     public function category()
     {
         return $this->belongsTo(Category::class);

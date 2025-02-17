@@ -19,6 +19,9 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\NumberInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\MultiSelect;
+use Filament\Forms\Components\KeyValue;
+
 
 class ProductResource extends Resource
 {
@@ -42,8 +45,8 @@ class ProductResource extends Resource
                     ->required(),
 
                 TextInput::make('weight')
-                    ->label('الوزن (كجم)')
-                    ->required(),
+                    ->label('الوزن (كجم)'),
+                   // ->required(),
                  //   ->min(0),
                 TextInput::make('price')
                     ->label('السعر')
@@ -62,6 +65,12 @@ class ProductResource extends Resource
                     ->label('التصنيف')
                     ->relationship('category', 'name')
                     ->required(),
+                    KeyValue::make('options')
+                    ->label('الخيارات')
+                    ->keyLabel('اسم الخيار')
+                    ->valueLabel('السعر')
+                    ->required()
+                    ->helperText('أدخل الخيارات مع قيمتها مثل "تقطيع للذبيحة - 10" أو أضف فئات جديدة.'),
             ]);
     }
 
@@ -90,6 +99,29 @@ class ProductResource extends Resource
 
             TextColumn::make('category.name')
                 ->label('التصنيف')
+                ->sortable(),
+                TextColumn::make('options')
+                ->label('الخيارات')
+                ->getStateUsing(function ($record) {
+                    $options = $record->options;
+
+                    // إذا كانت الـ options عبارة عن مصفوفة
+                    if (is_array($options)) {
+                        // بناء النص المنسق للخيارات
+                        $formattedOptions = '';
+                        foreach ($options as $category => $values) {
+                            $formattedOptions .= "$category: ";
+                            foreach ($values as $option => $price) {
+                                $formattedOptions .= "$option - $price, ";
+                            }
+                            $formattedOptions = rtrim($formattedOptions, '، ') . "\n";
+                        }
+
+                        return $formattedOptions;
+                    }
+
+                    return 'لا توجد خيارات';
+                })
                 ->sortable(),
             ])
             ->filters([

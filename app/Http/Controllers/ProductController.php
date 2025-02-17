@@ -21,7 +21,11 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with('category')->findOrFail($id);
-        return new ProductResource($product);
+       // dd($product->options);
+        return response()->json([
+            'product' => new ProductResource($product),
+            'options' => $product->options // ✅ إضافة الخيارات مع المنتج
+        ]);
     }
 
     public function getByCategory($category_id)
