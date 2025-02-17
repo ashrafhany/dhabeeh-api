@@ -56,6 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', [UserController::class, 'user']); // عرض بيانات المستخدم
         Route::put('/', [UserController::class, 'update']); // تحديث بيانات المستخدم
+        Route::delete('/delete', [UserController::class, 'deleteAccount']);
     });
     Route::prefix('settings')->group(function () {
         Route::get('/', [SettingsController::class, 'getLanguage']); // عرض الإعدادات

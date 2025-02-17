@@ -63,5 +63,17 @@ class UserController extends Controller
         "user"    => new UserResource($user) // ✅ استخدام الـ Resource هنا
     ], 200);
     }
+    public function deleteAccount(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        $user->delete(); // Soft Delete
+
+        return response()->json(['message' => 'Account deleted successfully'], 200);
+    }
 
 }
