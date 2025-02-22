@@ -17,15 +17,39 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|string|email|unique:users',
-            'phone' => 'required|string|unique:users|min:10|max:13',
+            'email' => 'nullable|string|email|unique:users,email,NULL,id,deleted_at,NULL',
+            'phone' => 'required|string|min:10|max:13|unique:users,phone,NULL,id,deleted_at,NULL',
             'address' => 'required|string|max:255',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+        $existingUser = User::withTrashed()->where('phone', $request->phone)
+        ->orWhere('email', $request->email)
+        ->first();
 
+if ($existingUser) {
+if ($existingUser->trashed()) {
+// إذا كان محذوفًا، استرجعه وقم بتحديث بياناته
+$existingUser->restore();
+$existingUser->update([
+'first_name' => $request->first_name,
+'last_name' => $request->last_name,
+'email' => $request->email,
+'phone' => $request->phone,
+'address' => $request->address,
+'password' => null,
+]);
+
+return response()->json([
+'message' => 'Your account has been restored successfully!',
+'token' => $existingUser->createToken('authToken')->plainTextToken
+], 200);
+} else {
+return response()->json(['error' => 'Phone or email already registered'], 422);
+}
+}
         $user = User::create([
             'first_name' => $request->first_name,
             'last_name' => $request->last_name,
@@ -51,11 +75,16 @@ class AuthController extends Controller
         $user = User::where('phone', $request->phone)->first();
 
         if (!$user) {
-            return response()->json(['error' => 'Phone number not registered'], 404);
+            return response()->json([
+                'error' => 'Phone number not registered',
+                //'redirect_to' => '/api/register',
+                'register_required' => true,
+                'phone' => $request->phone
+        ], 404);
         }
 
         $token = $user->createToken('authToken')->plainTextToken;
-        $expires_at = now()->addHours(6);
+        $expires_at = now()->addYear();//الغي المدة او خليها سنة
         // تحديث التوكن في جدول personal_access_tokens وتحديد صلاحية الانتهاء
     $user->tokens->last()->update([
         'expires_at' => $expires_at

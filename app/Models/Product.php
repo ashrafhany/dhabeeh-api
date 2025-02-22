@@ -12,15 +12,19 @@ class Product extends Model
     ['name',
     'description',
     'image',
-    'price',
-    'category_id',
-    'weight',
-    'stock',
-    'options'
+    'category_id'
     ];
-    protected $casts = [
-        'options' => 'array' // ✅ تحويل البيانات تلقائيًا من JSON إلى Array
-    ];
+    /*
+    public function getImageUrl()
+{
+    return $this->image ? asset('uploads/' . $this->image) : null;
+}
+    */
+    public function getImageUrl()
+{
+    return $this->image ? asset('storage/' . $this->image) : null;
+}
+
     public function category()
     {
         return $this->belongsTo(Category::class);
@@ -29,5 +33,15 @@ class Product extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function variants()
+    {
+        return $this->hasMany(ProductVariant::class);
+    }
+
+    public function options()
+    {
+        return $this->hasMany(ProductOption::class);
     }
 }

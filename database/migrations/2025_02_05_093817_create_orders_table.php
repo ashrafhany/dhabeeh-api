@@ -16,13 +16,14 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade'); // المستخدم الذي قام بالطلب
-            $table->foreignId('product_id')->constrained('products')->onDelete('cascade'); // المنتج المطلوب
+            $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade'); // الـ Variant المطلوب
             $table->integer('quantity')->default(1); // الكمية المطلوبة
             $table->decimal('total_price', 10, 2); // السعر الإجمالي للطلب
             $table->string('status')->default('pending'); // حالة الطلب (pending, completed, cancelled)
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.

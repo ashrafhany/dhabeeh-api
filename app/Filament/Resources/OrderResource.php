@@ -66,18 +66,9 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('user.name') // عرض اسم المستخدم
-                    ->label('العميل')
-                    ->sortable(),
-                TextColumn::make('product.name') // عرض اسم المنتج
-                    ->label('اسم المنتج')
-                    ->sortable(),
-                TextColumn::make('quantity') // عرض الكمية
-                    ->label('الكمية')
-                    ->sortable(),
-                TextColumn::make('total_price') // عرض السعر الإجمالي
-                    ->label('السعر الإجمالي')
-                    ->sortable(),
+                TextColumn::make('id')->sortable(),
+                TextColumn::make('user.first_name')->label('المستخدم')->sortable(),
+                TextColumn::make('total_price')->label('السعر الكلي')->sortable(),
                 BadgeColumn::make('status') // عرض حالة الطلب مع تمييز اللون
                     ->label('حالة الطلب')
                     ->enum([

@@ -16,9 +16,9 @@ class OrderController extends Controller
      */
     // جل   ب جميع الطلبات
     public function index()
-    {
-        return OrderResource::collection(Order::with(['user', 'product'])->latest()->paginate(15));
-    }
+{
+    return OrderResource::collection(Order::with(['user', 'variant.product'])->latest()->paginate(15));
+}
 
     /**
      * Store a newly created resource in storage.
@@ -28,32 +28,55 @@ class OrderController extends Controller
      */
     // إضافة طلب جديد
     public function store(Request $request)
-    {
-        if (!auth()->check()) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
+{
+    if (!auth()->check()) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
 
-        $product = Product::select ('price','stock')->findOrfail($request->product_id);
-        if ($product->stock < $request->quantity) {
-            return response()->json(['error' => 'Product out of stock'], 400);
-        }
-        $totalPrice = $product->price * $request->quantity;
+    $user = auth()->user();
+    $cartItems = $user->cart()->with('variant.product')->get(); // جلب كل عناصر السلة الخاصة بالمستخدم
 
+    if ($cartItems->isEmpty()) {
+        return response()->json(['error' => 'السلة فارغة'], 400);
+    }
+
+    $totalOrderPrice = 0;
+    $orders = [];
+
+    foreach ($cartItems as $cartItem) {
+        $variant = $cartItem->variant; // جلب الـ variant المرتبط بالعنصر
+        if (!$variant || $variant->stock < $cartItem->quantity) {
+            return response()->json(['error' => 'بعض العناصر غير متوفرة في المخزون'], 400);
+        }
+
+        // حساب السعر بعد الخصم إن وجد
+        $discountedPrice = $cartItem->total_price - $cartItem->discount_amount;
+        $totalOrderPrice += $discountedPrice;
+
+        // إنشاء الطلب لكل عنصر في السلة
         $order = Order::create([
-            'user_id' => auth()->id(),
-            'product_id' => $request->product_id,
-            'quantity' => $request->quantity,
-            'total_price' => $totalPrice,
+            'user_id' => $user->id,
+            'variant_id' => $cartItem->variant_id,
+            'quantity' => $cartItem->quantity,
+            'total_price' => $discountedPrice,
             'status' => 'pending',
         ]);
-        $product->stock -= $request->quantity;
-        return response()->json(['message' => 'Order created successfully!', 'order' => new OrderResource($order),'remaining_stock'=>$product->stock], 201);
 
+        $orders[] = $order;
+
+        // تحديث المخزون
+        $variant->decrement('stock', $cartItem->quantity);
     }
+
+    // حذف السلة بعد إنشاء الطلب
+    $user->cart()->delete();
+
+    return response()->json([
+        'message' => 'تم إنشاء الطلب بنجاح!',
+        'total_order_price' => $totalOrderPrice,
+        'orders' => $orders
+    ], 201);
+}
 
 
     /**
@@ -63,11 +86,11 @@ class OrderController extends Controller
      * @return \Illuminate\Http\Response
      */
         // عرض تفاصيل طلب معين
-    public function show($id)
-    {
-        $order =Order::with(['user', 'product'])->findOrFail($id);
-        return new OrderResource($order);
-    }
+        public function show($id)
+        {
+            $order = Order::with(['user', 'variant.product'])->findOrFail($id);
+            return new OrderResource($order);
+        }
 
     /**
      * Update the specified resource in storage.
