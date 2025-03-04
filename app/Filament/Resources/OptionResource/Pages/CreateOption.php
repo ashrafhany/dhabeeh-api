@@ -9,4 +9,8 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateOption extends CreateRecord
 {
     protected static string $resource = OptionResource::class;
+    public function getTitle(): string
+{
+    return ' إضافة خيار جديد';
+}
 }

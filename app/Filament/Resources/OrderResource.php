@@ -25,7 +25,7 @@ use Filament\Tables\Columns\BadgeColumn;
 class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-s-shopping-bag';
     protected static ?string $navigationLabel = 'الطلبات';
     protected static ?string $navigationGroup = 'إدارة الطلبات';
     protected static ?int $navigationSort = 1;
@@ -36,6 +36,16 @@ class OrderResource extends Resource
             ->schema([
                // TextInput::make('order_number')
                   //  ->required(),
+                Select::make('user_id')
+                    ->label('المستخدم')
+                    ->relationship('user', 'first_name')
+                    ->searchable()
+                    ->required(),
+                Select::make('variant_id')
+                    ->label('المنتج رقم')
+                    ->relationship('variant', 'product.name')
+                    ->searchable()
+                    ->required(),
                 Select::make('status')
                     ->label('حالة الطلب')
                 ->options([
@@ -47,18 +57,18 @@ class OrderResource extends Resource
                     ])
                     ->required()
                     ->default(fn ($record) => $record->status ?? 'pending'),
-             //   TextInput::make('user.name')
-                  //  ->label('User')
-                  //  ->disabled(),
-               // TextInput::make('product.name')
-                  //  ->label('Product')
-                //    ->disabled(),
                 TextInput::make('total_price')
-                ->label('السعر الإجمالي')
-                ->disabled(),
+                    ->label('السعر الإجمالي')
+                    ->disabled(),
                 TextInput::make('quantity')
-                ->label('الكمية')
-                ->disabled(),
+                    ->label('الكمية')
+                    ->disabled(),
+                TextInput::make('shipping_address')
+                    ->label('عنوان الشحن')
+                    ->disabled(),
+                TextInput::make('notes')
+                    ->label('ملاحظات')
+                    ->disabled(),
             ]);
     }
 
@@ -66,9 +76,15 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->sortable(),
-                TextColumn::make('user.first_name')->label('المستخدم')->sortable(),
-                TextColumn::make('total_price')->label('السعر الكلي')->sortable(),
+                TextColumn::make('id')
+                    ->sortable(),
+                TextColumn::make('user.first_name')
+                    ->label('المستخدم')
+                    ->sortable(),
+                TextColumn::make('total_price')
+                    ->label('السعر الكلي')
+                    ->formatStateUsing(fn ($record) => number_format($record->total_price - $record->discount_amount, 2))
+                    ->sortable(),
                 BadgeColumn::make('status') // عرض حالة الطلب مع تمييز اللون
                     ->label('حالة الطلب')
                     ->enum([
@@ -82,6 +98,12 @@ class OrderResource extends Resource
                 TextColumn::make('created_at')
                     ->label('تاريخ الإنشاء')
                     ->dateTime(), // عرض تاريخ الإنشاء
+                TextColumn::make('shipping_address')
+                    ->label('عنوان الشحن')
+                    ->sortable(),
+                TextColumn::make('notes')
+                    ->label('ملاحظات')
+                    ->sortable(),
                 ])
             ->filters([
                 SelectFilter::make('status')->options([
@@ -113,8 +135,8 @@ class OrderResource extends Resource
     {
         return [
             'index' => Pages\ListOrders::route('/'),
-            'create' => Pages\CreateOrder::route('/create'),
-            'edit' => Pages\EditOrder::route('/{record}/edit'),
+         //   'create' => Pages\CreateOrder::route('/create'),
+          //  'edit' => Pages\EditOrder::route('/{record}/edit'),
         ];
     }
     public static function canCreate(): bool

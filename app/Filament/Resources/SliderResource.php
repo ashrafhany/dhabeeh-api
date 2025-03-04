@@ -28,7 +28,7 @@ class SliderResource extends Resource
 {
 
     protected static ?string $model = Slider::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-view-boards';
     protected static ?string $navigationLabel = 'لوحة الاعلانات ';
     protected static ?string $navigationGroup = 'إدارة المنتجات';
     protected static ?int $navigationSort = 1;
@@ -102,8 +102,12 @@ class SliderResource extends Resource
     {
         return [
             'index' => Pages\ListSliders::route('/'),
-            'create' => Pages\CreateSlider::route('/create'),
-            'edit' => Pages\EditSlider::route('/{record}/edit'),
+        //    'create' => Pages\CreateSlider::route('/create'),
+        //    'edit' => Pages\EditSlider::route('/{record}/edit'),
         ];
+    }
+    public static function getPluralModelLabel(): string
+    {
+        return 'الاعلانات';
     }
 }

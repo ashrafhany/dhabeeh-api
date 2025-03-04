@@ -21,7 +21,7 @@ use Filament\Forms\Components\TextInput;
 class CouponsResource extends Resource
 {
     protected static ?string $model = Coupon::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-s-gift';
     protected static ?string $navigationLabel = 'كوبون خصم';
     protected static ?string $navigationGroup = 'إدارة الكوبونات';
     protected static ?int $navigationSort = 1;
@@ -90,8 +90,8 @@ class CouponsResource extends Resource
     {
         return [
             'index' => Pages\ListCoupons::route('/'),
-            'create' => Pages\CreateCoupons::route('/create'),
-            'edit' => Pages\EditCoupons::route('/{record}/edit'),
+           // 'create' => Pages\CreateCoupons::route('/create'),
+           // 'edit' => Pages\EditCoupons::route('/{record}/edit'),
         ];
     }
     public static function getPluralModelLabel(): string

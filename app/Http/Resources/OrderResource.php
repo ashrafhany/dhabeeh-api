@@ -27,12 +27,15 @@ class OrderResource extends JsonResource
             'id' => $this->variant->id,
             'product_id' => $this->variant->product->id,
             'product_name' => $this->variant->product->name,
+            'product_image' => $this->variant->product->getImageUrl(),
             'variant_weight' => $this->variant->weight,
             'variant_price' => $this->variant->price,
             ],
             'quantity' => $this->quantity,
             'total_price' => $this->total_price,
             'status' => $this->status,
+            'shipping_address' => $this->shipping_address,
+            'notes' => $this->notes,
             'order_date' => $this->created_at->format('Y-m-d H:i'),
         ];
     }

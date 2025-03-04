@@ -6,6 +6,7 @@ use App\Filament\Resources\CartResource\Pages;
 use App\Filament\Resources\CartResource\RelationManagers;
 use App\Models\Cart;
 use App\Models\User;
+use App\Models\Product;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -20,6 +21,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\NumberInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\DateTimePicker;
 
 
 class CartResource extends Resource
@@ -37,24 +39,24 @@ class CartResource extends Resource
                 Select::make('user_id')
                 ->relationship('user', 'name')
                 ->searchable()
+                ->label('المستخدم')
                 ->required(),
 
             Select::make('product_id')
                 ->relationship('product', 'name')
                 ->searchable()
+                ->label('المنتج')
                 ->required(),
 
             TextInput::make('quantity')
                 ->numeric()
+                ->label('الكمية')
                 ->required(),
 
             TextInput::make('total_price')
                 ->numeric()
+                ->label('السعر الكلي')
                 ->required(),
-
-            TextInput::make('discount')
-                ->numeric()
-                ->default(0),
             ]);
     }
 
@@ -62,12 +64,12 @@ class CartResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->sortable(),
-                TextColumn::make('user.name')->label('المستخدم')->searchable(),
-                TextColumn::make('product.name')->label('المنتج')->searchable(),
-                TextColumn::make('quantity')->sortable(),
-                TextColumn::make('total_price')->sortable(),
-                TextColumn::make('discount')->sortable(),
+                TextColumn::make('id')->sortable()->label('رقم السلة'),
+                TextColumn::make('user.first_name')->label('المستخدم')->searchable(),
+                TextColumn::make('variant.product.name')->label('المنتج')->searchable(),
+                TextColumn::make('quantity')->label('الكمية')->sortable(),
+                TextColumn::make('total_price')->label('السعر الكلي')->sortable(),
+              //  TextColumn::make('discount')->sortable(),
                 TextColumn::make('created_at')
                     ->label('تاريخ الإضافة')
                     ->dateTime(),
@@ -94,12 +96,16 @@ class CartResource extends Resource
     {
         return [
             'index' => Pages\ListCarts::route('/'),
-            'create' => Pages\CreateCart::route('/create'),
-            'edit' => Pages\EditCart::route('/{record}/edit'),
+          //  'create' => Pages\CreateCart::route('/create'),
+           // 'edit' => Pages\EditCart::route('/{record}/edit'),
         ];
     }
     public static function canCreate(): bool
     {
         return false;
+    }
+    public static function getPluralModelLabel(): string
+    {
+        return 'السلة';
     }
 }

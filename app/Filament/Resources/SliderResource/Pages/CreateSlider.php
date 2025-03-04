@@ -9,4 +9,8 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateSlider extends CreateRecord
 {
     protected static string $resource = SliderResource::class;
+    public function getTitle(): string
+    {
+        return ' إضافة اعلان جديد';
+    }
 }

@@ -12,7 +12,6 @@ class TwilioService
         $token = env('TWILIO_AUTH_TOKEN');
         $twilioNumber = env('TWILIO_PHONE_NUMBER');
 
-        // ✅ تحويل الرقم إلى تنسيق E.164 إذا لم يكن كذلك
         if (!str_starts_with($phone, '+')) {
             $phone = '+20' . ltrim($phone, '0'); // تحويل الرقم المصري إلى +20
         }

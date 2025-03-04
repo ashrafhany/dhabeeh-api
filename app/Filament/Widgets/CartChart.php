@@ -4,6 +4,8 @@ namespace App\Filament\Widgets;
 use App\Models\Cart;
 use Filament\Widgets\BubbleChartWidget;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+
 class CartChart extends BubbleChartWidget
 {
     protected static ?string $heading = 'السلة';

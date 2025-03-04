@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'variant_id', 'quantity', 'total_price', 'status'];
+    protected $fillable = ['user_id', 'variant_id', 'quantity', 'total_price', 'status','discount_amount','shipping_address','notes'];
 
     public function variant()
     {
@@ -26,4 +26,13 @@ class Order extends Model
     {
         return ['Pending', 'Current', 'inDelivery', 'Delivered', 'Refused'];
     }
+    protected static function booted()
+{
+    static::deleting(function ($order) {
+        if ($order->variant) {
+            $order->variant->increment('stock', $order->quantity);
+        }
+    });
+}
+
 }
