@@ -6,6 +6,7 @@ use App\Filament\Resources\OptionResource\Pages;
 use App\Filament\Resources\OptionResource\RelationManagers;
 use App\Models\ProductOption;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
 use Filament\Resources\Table;
@@ -14,6 +15,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Forms\Components\TagsInput;
 
 class OptionResource extends Resource
 {
@@ -27,12 +29,20 @@ class OptionResource extends Resource
     {
         return $form
             ->schema([
+                TextInput::make('type')
+                    ->label('النوع')
+                    ->required(),
+                Select::make('product_id')
+                    ->relationship('product', 'name')
+                    ->label('المنتج')
+                    ->required(),
                 TextInput::make('name')
                     ->label('الاسم')
                     ->required(),
                 TextInput::make('price')
                     ->label('السعر')
                     ->required(),
+
             ]);
     }
 
@@ -43,6 +53,9 @@ class OptionResource extends Resource
                 TextColumn::make('id')
                     ->label('الرقم')
                     ->sortable(),
+                TextColumn::make('type')
+                    ->label('النوع')
+                    ->searchable(),
                 TextColumn::make('name')
                     ->label('الاسم')
                     ->searchable(),
