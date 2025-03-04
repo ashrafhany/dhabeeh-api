@@ -9,4 +9,8 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateVariant extends CreateRecord
 {
     protected static string $resource = VariantResource::class;
+    public function getTitle(): string
+    {
+        return ' إضافة وزن جديد';
+    }
 }

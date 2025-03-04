@@ -26,7 +26,7 @@ use Filament\Forms\Components\KeyValue;
 class ProductResource extends Resource
 {
     protected static ?string $model = Product::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-truck';
     protected static ?string $navigationLabel = 'المنتجات';
     protected static ?string $navigationGroup = 'إدارة المنتجات';
     protected static ?int $navigationSort = 1;
@@ -93,8 +93,8 @@ class ProductResource extends Resource
     {
         return [
             'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+        //    'create' => Pages\CreateProduct::route('/create'),
+        //    'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
     public static function getPluralModelLabel(): string

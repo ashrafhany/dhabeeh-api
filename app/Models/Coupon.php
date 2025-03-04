@@ -15,4 +15,15 @@ class Coupon extends Model
     {
         return !$this->expires_at || $this->expires_at > now();
     }
+    public function calculateDiscount($totalOrderPrice)
+{
+    if ($this->type === 'percentage') {
+        return $totalOrderPrice * ($this->discount / 100);
+    } elseif ($this->type === 'fixed') {
+        return min($this->discount, $totalOrderPrice);
+    }
+    return 0;
+}
+
+
 }

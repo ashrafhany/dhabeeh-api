@@ -18,7 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 class OptionResource extends Resource
 {
     protected static ?string $model = ProductOption::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-adjustments';
     protected static ?string $navigationLabel = 'الخيارات';
     protected static ?string $navigationGroup = 'إدارة المنتجات';
     protected static ?int $navigationSort = 1;
@@ -27,8 +27,12 @@ class OptionResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')->required(),
-                TextInput::make('price')->required(),
+                TextInput::make('name')
+                    ->label('الاسم')
+                    ->required(),
+                TextInput::make('price')
+                    ->label('السعر')
+                    ->required(),
             ]);
     }
 
@@ -36,9 +40,15 @@ class OptionResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')->sortable(),
-                TextColumn::make('name')->searchable(),
-                TextColumn::make('price'),
+                TextColumn::make('id')
+                    ->label('الرقم')
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->label('الاسم')
+                    ->searchable(),
+                TextColumn::make('price')
+                    ->label('السعر')
+                    ->searchable(),
             ])
             ->filters([
                 //
@@ -62,8 +72,12 @@ class OptionResource extends Resource
     {
         return [
             'index' => Pages\ListOptions::route('/'),
-            'create' => Pages\CreateOption::route('/create'),
-            'edit' => Pages\EditOption::route('/{record}/edit'),
+        //    'create' => Pages\CreateOption::route('/create'),
+          //  'edit' => Pages\EditOption::route('/{record}/edit'),
         ];
+    }
+    public static function getPluralModelLabel(): string
+    {
+        return 'الخيارات';
     }
 }

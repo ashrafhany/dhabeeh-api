@@ -20,7 +20,7 @@ use Filament\Forms\Components\TextInput;
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-s-view-list';
     protected static ?string $navigationLabel = 'انواع المنتجات';
     protected static ?string $navigationGroup = 'إدارة المنتجات';
     protected static ?int $navigationSort = 1;
@@ -67,8 +67,8 @@ class CategoryResource extends Resource
     {
         return [
             'index' => Pages\ListCategories::route('/'),
-            'create' => Pages\CreateCategory::route('/create'),
-            'edit' => Pages\EditCategory::route('/{record}/edit'),
+           // 'create' => Pages\CreateCategory::route('/create'),
+           // 'edit' => Pages\EditCategory::route('/{record}/edit'),
         ];
     }
     public static function getPluralModelLabel(): string

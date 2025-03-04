@@ -52,7 +52,8 @@
             Route::get('/{id}', [OrderController::class, 'show']); // عرض تفاصيل طلب معين
             Route::put('/{id}', [OrderController::class, 'update']); // تحديث حالة الطلب
             Route::delete('/{id}', [OrderController::class, 'destroy']); // حذف الطلب
-            Route::post('/status', [OrderController::class, 'getOrdersByStatus']);   // ✅ إضافة مسار الطلبات بحالة معينة
+            Route::get('/status/{status}', [OrderController::class, 'getOrdersByStatus']);  // ✅ إضافة مسار الطلبات بحالة معينة
+            Route::post('/check-coupon', [OrderController::class, 'checkCoupon']); // ✅ إضافة مسار فحص الكوبون
         });
         Route::prefix('user')->group(function () {
             Route::get('/', [UserController::class, 'user']); // عرض بيانات المستخدم
