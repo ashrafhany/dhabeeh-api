@@ -35,5 +35,10 @@ return [
     'secret_key' => env('TAP_SECRET_KEY'),
 ],
 
+'firebase' => [
+    'project_id' => env('FIREBASE_PROJECT_ID'),
+    'credentials' => env('FIREBASE_CREDENTIALS', 'firebase/service-account.json'),
+    'database_url' => env('FIREBASE_DATABASE_URL'),
+],
 
 ];

@@ -34,7 +34,19 @@ class PaymentStatusChanged extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        $channels = ['database'];
+
+        // إضافة قناة البريد الإلكتروني إذا كان للمستخدم بريد إلكتروني صحيح
+        if ($notifiable->email) {
+            $channels[] = 'mail';
+        }
+
+        // إضافة قناة FCM إذا كان للمستخدم توكن وخاصية الإشعارات مفعلة
+        if ($notifiable->fcm_token && $notifiable->notifications_enabled) {
+            $channels[] = \App\Channels\FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -102,5 +114,38 @@ class PaymentStatusChanged extends Notification
     public function toDatabase($notifiable)
     {
         return $this->toArray($notifiable);
+    }
+
+    /**
+     * Get the firebase cloud messaging representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toFcm($notifiable)
+    {
+        $statusMessages = [
+            'pending' => 'في انتظار الدفع',
+            'paid' => 'تم استلام الدفع بنجاح',
+            'failed' => 'فشلت عملية الدفع',
+            'refunded' => 'تم إرجاع المبلغ المدفوع'
+        ];
+
+        $message = $statusMessages[strtolower($this->paymentStatus)] ?? 'تم تحديث حالة الدفع';
+        $productName = $this->order->variant->product->name ?? 'منتج';
+
+        return [
+            'title' => 'تحديث حالة الدفع للطلب #' . $this->order->id,
+            'body' => $message,
+            'data' => [
+                'type' => 'payment_status',
+                'order_id' => $this->order->id,
+                'payment_status' => $this->paymentStatus,
+                'payment_method' => $this->order->payment_method,
+                'product_name' => $productName,
+                'click_action' => 'PAYMENT_DETAILS'
+            ],
+            'click_action' => 'PAYMENT_DETAILS'
+        ];
     }
 }

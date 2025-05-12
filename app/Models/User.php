@@ -38,6 +38,8 @@ class User extends Authenticatable implements FilamentUser, HasName
         'phone',
         'otp', // تخزين رمز التحقق المؤقت
         'language',
+        'fcm_token',
+        'notifications_enabled',
     ];
 
     /**

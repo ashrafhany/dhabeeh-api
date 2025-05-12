@@ -35,7 +35,19 @@ class OrderStatusChanged extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        $channels = ['database'];
+
+        // إضافة قناة البريد الإلكتروني إذا كان للمستخدم بريد إلكتروني صحيح
+        if ($notifiable->email) {
+            $channels[] = 'mail';
+        }
+
+        // إضافة قناة FCM إذا كان للمستخدم توكن وخاصية الإشعارات مفعلة
+        if ($notifiable->fcm_token && $notifiable->notifications_enabled) {
+            $channels[] = \App\Channels\FcmChannel::class;
+        }
+
+        return $channels;
     }
 
     /**
@@ -98,5 +110,38 @@ class OrderStatusChanged extends Notification
     public function toDatabase($notifiable)
     {
         return $this->toArray($notifiable);
+    }
+
+    /**
+     * Get the firebase cloud messaging representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toFcm($notifiable)
+    {
+        $statusMessages = [
+            'pending' => 'تم استلام طلبك وهو قيد المعالجة',
+            'current' => 'جاري تحضير طلبك',
+            'inDelivery' => 'طلبك في طريقه إليك الآن',
+            'delivered' => 'تم توصيل طلبك بنجاح',
+            'refused' => 'تم رفض الطلب'
+        ];
+
+        $message = $statusMessages[strtolower($this->order->status)] ?? 'تم تغيير حالة طلبك';
+        $productName = $this->order->variant->product->name ?? 'منتج';
+
+        return [
+            'title' => 'تحديث حالة الطلب #' . $this->order->id,
+            'body' => $message,
+            'data' => [
+                'type' => 'order_status',
+                'order_id' => $this->order->id,
+                'status' => $this->order->status,
+                'product_name' => $productName,
+                'click_action' => 'ORDER_DETAILS'
+            ],
+            'click_action' => 'ORDER_DETAILS'
+        ];
     }
 }

@@ -19,6 +19,8 @@
     use App\Http\Controllers\OrderTesterController;
     use App\Http\Controllers\TapCallbackTestController;
     use App\Http\Controllers\OrderFlowTestController;
+    use App\Http\Controllers\FcmController;
+    use App\Http\Controllers\FcmTestController;
 
     /*
     |--------------------------------------------------------------------------
@@ -113,6 +115,17 @@
             // Test routes - remove in production
             Route::post('/test/order-status', [TestNotificationController::class, 'sendOrderStatusTest']);
             Route::post('/test/payment-status', [TestNotificationController::class, 'sendPaymentStatusTest']);
+        });
+
+        // FCM Push Notifications Routes
+        Route::prefix('fcm')->group(function () {
+            Route::post('/register', [FcmController::class, 'registerToken']);
+            Route::post('/toggle', [FcmController::class, 'toggleNotifications']);
+            Route::delete('/unregister', [FcmController::class, 'removeToken']);
+
+            // اختبار الإشعارات
+            Route::post('/test', [FcmTestController::class, 'sendMeTestNotification']);
+            Route::post('/test/user', [FcmTestController::class, 'sendTestNotification']);
         });
     });
 
