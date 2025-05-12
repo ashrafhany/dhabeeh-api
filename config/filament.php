@@ -106,6 +106,7 @@ return [
         'path' => app_path('Filament/Pages'),
         'register' => [
             Pages\Dashboard::class,
+            App\Filament\Pages\PaymentReports::class,
         ],
     ],
 
@@ -141,6 +142,8 @@ return [
         'register' => [
             Widgets\AccountWidget::class,
             Widgets\FilamentInfoWidget::class,
+            App\Filament\Widgets\PaymentStatsWidget::class,
+            App\Filament\Widgets\PaymentChartWidget::class,
         ],
     ],
 

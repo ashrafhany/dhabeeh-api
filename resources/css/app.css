@@ -3,3 +3,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* تحسينات خاصة بعرض الصور في Filament 2 */
+.filament-tables-image-column img {
+    object-fit: cover !important;
+    border-radius: 50%;
+    width: 48px;
+    height: 48px;
+    border: 2px solid #e5e7eb;
+}
+
+.filament-tables-image-column a {
+    display: block;
+}
+
+/* تحسين عرض صور المنتجات في الإصدار الثاني لـ Filament */
+.filament-tables-image-column__image {
+    width: 48px !important;
+    height: 48px !important;
+}
