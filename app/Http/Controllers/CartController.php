@@ -13,183 +13,134 @@ class CartController extends Controller
 {
     public function index()
 {
-    if (!auth()->check()) {
-        return response()->json(['error' => 'Unauthorized'], 401);
+    if (!auth()->check()){
+        return response()->json(['error'=>'Unauthorized'], 401);
     }
-
     $cartItems = Cart::with(['variant.product', 'options'])
         ->where('user_id', Auth::id())
-        ->get(['id', 'user_id', 'variant_id', 'quantity', 'total_price']);
-
-    if ($cartItems->isEmpty()) {
+        ->get(['id','user_id','variant_id','quantity', 'total_price']);
+    if ($cartItems->isEmpty()){
         return response()->json([
-            'message' => 'السلة فارغة',
+            'message'=> 'السلة فارغة',
             'cart_items' => [],
-
         ]);
     }
-
-    // ✅ القيم الافتراضية
-    $deliveryFee = 10.00; // رسوم التوصيل
-    $vatPercentage = 0.15; // نسبة القيمة المضافة (15%)
-
-    // ✅ حساب إجمالي الطلب قبل الخصم
-    $totalOrderPrice = $cartItems->sum('total_price');
-
-    // ✅ استرجاع قيمة الخصم من الكاش إن وجد
-    $discountAmount = cache()->get('discount_amount_' . Auth::id(), 0);
-
-    // ✅ حساب القيمة المضافة (على الإجمالي قبل الخصم وبعد التوصيل)
-    $subtotalBeforeDiscount = $totalOrderPrice + $deliveryFee;
-    $vatAmount = $subtotalBeforeDiscount * $vatPercentage;
-
-    // ✅ الحساب النهائي بعد الخصم والضريبة والتوصيل
-    $finalTotalPrice = $subtotalBeforeDiscount + $vatAmount - $discountAmount;
-
-    return response()->json([
-        'total_order_price' => round($totalOrderPrice, 2),
-        'delivery_fee' => round($deliveryFee, 2),
-        'cart_items' => $cartItems
-
-
-           // 'vat_amount' => round($vatAmount, 2),
-          //  'discount_amount' => round($discountAmount, 2),
-          //  'final_total_price' => round($finalTotalPrice, 2),
-    ]);
+        $deliveryFee =10.00;
+        $vatPercentage = 0.15;
+        $totalOrderPrice = $cartItems->sum('total_price');
+        $discountAmount = cache()->get ('discount_amount_' . Auth::id(), 0);
+        $subtotalBeforeDiscount = $totalOrderPrice + $deliveryFee;
+        $vatAmount = $subtotalBeforeDiscount * $vatPercentage;
+        $finalTotalPrice = $subtotalBeforeDiscount + $vatAmount - $discountAmount;
+        return response()->json([
+            'total_order_price'=> round($totalOrderPrice, 2),
+            'delivery_fee'=> round ($deliveryFee, 2),
+            'cart_items'=> $cartItems
+        ]);
 }
-
-
     public function add(Request $request)
     {
         $request->validate([
-            'variant_id' => 'required|exists:product_variants,id',
-            'quantity' => 'required|integer|min:1',
-            'options' => 'nullable|array',
+            'variant_id'=>'required|exists:product_variants,id',
+            'quantity'=>'required|integer|min:1',
+            'options'=>'nullable|array',
         ]);
-
         $userId = Auth::id();
         $variant = ProductVariant::findOrFail($request->variant_id);
-
-        if ($variant->stock < $request->quantity) {
-            return response()->json(['message' => 'الكمية المطلوبة غير متوفرة'], 400);
+        if ($variant->stock < $request-> quantity){
+            return response()->json(['massage'=>'الكمية المطلوبة غير متوفرة'],400);
         }
-
-        $cartItem = Cart::firstOrNew([
-            'user_id' => $userId,
-            'variant_id' => $variant->id
+        $cartItem = Cart:: firstOrNew([
+            'user_id'=>$userId,
+            'variant_id'=>$variant->id
         ]);
-
-        if ($cartItem->exists) {
+        if ($cartItem->exists){
             $cartItem->quantity += $request->quantity;
-        } else {
+        }else{
             $cartItem->quantity = $request->quantity;
         }
-
         $totalPrice = $cartItem->quantity * $variant->price;
         $cartItem->total_price = $totalPrice;
-
         $cartItem->save();
-
-        if ($request->options) {
+        if($request-> options){
             $cartItem->options()->delete();
-
-            foreach ($request->options as $option) {
+            foreach ($request->options as $option){
                 $opt = ProductOption::findOrFail($option['option_id']);
-                $optionTotal = $opt->price * ($option['quantity'] ?? 1);
-
+                $optionTotal = $opt->price * ($option['quantity']?? 1);
                 CartOption::create([
-                    'cart_id' => $cartItem->id,
-                    'option_id' => $option['option_id'],
-                    'quantity' => $option['quantity'] ?? 1,
-                    'total_price' => $optionTotal
+                    'cart_id'=>$cartItem->id,
+                    'option_id'=>$option['option_id'],
+                    'quantity'=> $option['quantity'] ?? 1,
+                    'total_price'=>$optionTotal
                 ]);
-
                 $totalPrice += $optionTotal;
             }
         }
-
         $cartItem->total_price = $totalPrice;
         $cartItem->save();
-
-        $variant->decrement('stock', $request->quantity);
-
+        $variant->decrement('stock', $request-> quantity);
         return response()->json([
-            'message' => 'تمت الإضافة إلى السلة بنجاح',
-            'cart' => $cartItem->load('options'),
-            'remaining_stock' => $variant->stock
-        ], 201);
+            'message'=>'تمت الاضافة الي السلة بنجاح',
+            'cart'=>$cartItem->load('options'),
+            'remaining_stock'=>$variant->stock],201);
     }
-
     public function update(Request $request, $id)
     {
         $request->validate([
-            'quantity' => 'required|integer|min:1',
+            'quantity'=> 'required|integer|min:1',
             'options' => 'nullable|array',
         ]);
-
         $cartItem = Cart::where('user_id', Auth::id())->where('variant_id', $id)->firstOrFail();
         $variant = ProductVariant::findOrFail($id);
-
         $difference = $request->quantity - $cartItem->quantity;
-        if ($difference > 0 && $variant->stock < $difference) {
-            return response()->json(['error' => 'الكمية المطلوبة غير متوفرة'], 400);
+        if ($difference > 0 && $variant ->stock < $difference){
+            return response()->json(['error'=>'الكمية المطلوبة غير متوفرة'], 400);
         }
-
-        $cartItem->quantity = $request->quantity;
+        $cartItem ->quantity = $request->quantity;
         $cartItem->save();
-
-        if ($request->options) {
+        if ($request->options){
             $cartItem->options()->delete();
-            foreach ($request->options as $option) {
-                $opt = ProductOption::findOrFail($option['option_id']);
-                $optionTotal = $opt->price * ($option['quantity'] ?? 1);
-
+            foreach ($request->options as $option){
+                $otp = ProductOption::findOrFail($option['option_id']);
+                $optionTotal = $otp->price * ($option['quantity'] ?? 1);
                 CartOption::create([
-                    'cart_id' => $cartItem->id,
-                    'option_id' => $option['option_id'],
-                    'quantity' => $option['quantity'] ?? 1,
+                    'cart_id'=>$cartItem->id,
+                    'option_id'=>$option['option_id'],
+                    'quantity'=>$option['quantity']?? 1,
                     'total_price' => $optionTotal
                 ]);
             }
         }
-
         $totalPrice = $cartItem->quantity * $variant->price + $cartItem->options()->sum('total_price');
         $cartItem->total_price = $totalPrice;
         $cartItem->save();
-
         $variant->decrement('stock', $difference);
-
         return response()->json([
-            'message' => 'تم تحديث الكمية والخيارات بنجاح',
-            'cart' => $cartItem->load('options'),
-            'remaining_stock' => $variant->stock
+            'message'=>'تم تحديث الكمية والخيارات بنجاح',
+            'cart'=>$cartItem->load('options'),
+            'remaining_stock'=>$variant->stock
         ]);
     }
 
     public function remove(Request $request)
     {
         $request->validate([
-            'variant_id' => 'required|exists:product_variants,id',
-            'quantity' => 'required|integer|min:1'
+            'variant_id'=>'required|exits:prouduct_variants,id',
+            'quantity'=>'required|integer|min:1'
         ]);
-
         $cartItem = Cart::where('user_id', Auth::id())->where('variant_id', $request->variant_id)->first();
-        if (!$cartItem) return response()->json(['error' => 'العنصر غير موجود في السلة'], 404);
-
+        if (!$cartItem) return response()->json(['error'=>'العنصر غير موجود في السلة'],404);
         $variant = ProductVariant::findOrFail($request->variant_id);
-
-        if ($cartItem->quantity > $request->quantity) {
-            $cartItem->decrement('quantity', $request->quantity);
+        if ($cartItem->quantity > $request->quantity){
+            $cartItem ->decrement('quantity', $request->quantity);
             $cartItem->decrement('total_price', $request->quantity * $variant->price);
-        } else {
+        }else{
             $cartItem->delete();
         }
-
         $variant->increment('stock', $request->quantity);
-
         return response()->json([
-            'message' => 'تمت إزالة الكمية من السلة بنجاح',
-            'remaining_stock' => $variant->stock
+            'message'=>'تمت ازالة الكمية من السلة بنجاح',
+            'remaining_stock'=>$variant->stock
         ]);
     }
 

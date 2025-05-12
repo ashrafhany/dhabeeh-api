@@ -30,5 +30,10 @@ return [
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
+'tap' => [
+    'base_url' => env('TAP_BASE_URL', 'https://api.tap.company/v2'),
+    'secret_key' => env('TAP_SECRET_KEY'),
+],
+
 
 ];

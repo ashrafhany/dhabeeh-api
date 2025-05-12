@@ -1,4 +1,4 @@
-    <?php
+<?php
 
     use Illuminate\Http\Request;
     use Illuminate\Support\Facades\Route;
@@ -12,6 +12,14 @@
     use App\Http\Controllers\InfoController;
     use App\Http\Controllers\CartController;
     use App\Http\Controllers\SliderController;
+    use App\Http\Controllers\NotificationController;
+    use App\Http\Controllers\TestNotificationController;
+    use App\Http\Controllers\TapTestController;
+    use App\Http\Controllers\TapDirectTestController;
+    use App\Http\Controllers\OrderTesterController;
+    use App\Http\Controllers\TapCallbackTestController;
+    use App\Http\Controllers\OrderFlowTestController;
+
     /*
     |--------------------------------------------------------------------------
     | API Routes
@@ -33,6 +41,17 @@
         return $request->user();
     });
     */
+
+    // TAP Payment Testing Routes
+    Route::prefix('tap-test')->group(function () {
+        Route::post('/charge', [TapTestController::class, 'testCharge']);
+        Route::post('/direct', [TapDirectTestController::class, 'testDirectCharge']);
+        Route::post('/order-flow', [OrderTesterController::class, 'testTapCallback']);
+        Route::post('/callback', [TapCallbackTestController::class, 'testCallback']);
+    });
+
+    Route::get('/tap/callback', [OrderController::class, 'handleTapRedirect'])->name('tap.callback');
+
     Route::middleware(['auth:sanctum'])->group(function () {
         Route::prefix('categories')->group(function () {
             Route::get('/', [CategoryController::class, 'index']);  // جلب جميع التصنيفات
@@ -82,6 +101,18 @@
 
         Route::prefix('sliders')->group(function () {
             Route::get('/', [SliderController::class, 'index']); // جلب جميع السلايدرز
+        });
+
+        // Notification Routes
+        Route::prefix('notifications')->group(function () {
+            Route::get('/', [NotificationController::class, 'index']);
+            Route::post('/{id}/read', [NotificationController::class, 'markAsRead']);
+            Route::post('/read-all', [NotificationController::class, 'markAllAsRead']);
+            Route::delete('/{id}', [NotificationController::class, 'destroy']);
+
+            // Test routes - remove in production
+            Route::post('/test/order-status', [TestNotificationController::class, 'sendOrderStatusTest']);
+            Route::post('/test/payment-status', [TestNotificationController::class, 'sendPaymentStatusTest']);
         });
     });
 

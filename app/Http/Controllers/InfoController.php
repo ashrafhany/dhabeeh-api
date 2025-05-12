@@ -11,7 +11,7 @@ class InfoController extends Controller
     }
 
     public function contact() {
-        return response()->json(['phone' => '+966123456789', 'email' => 'support@example.com']);
+        return response()->json(['phone' => '+9660507944402', 'email' => 'support@example.com']);
     }
 
     public function privacyPolicy() {
