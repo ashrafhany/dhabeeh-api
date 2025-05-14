@@ -29,7 +29,7 @@ class NotificationLogs extends Page implements Tables\Contracts\HasTable
         // You can customize this logic based on your permission system
         return auth()->check() && auth()->user()->canAccessFilament();
     }
-    
+
     protected static string $view = 'filament.pages.notification-logs';
 
     public function getTableQuery(): Builder
