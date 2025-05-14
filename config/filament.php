@@ -107,6 +107,8 @@ return [
         'register' => [
             Pages\Dashboard::class,
             App\Filament\Pages\PaymentReports::class,
+            App\Filament\Pages\ManageNotifications::class,
+            App\Filament\Pages\NotificationLogs::class,
         ],
     ],
 
