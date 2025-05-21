@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->string('shipping_address')->after('discount_amount');
+            $table->string('shipping_address')->after('status')->nullable()->comment('Shipping address for the order');
         });
     }
 
