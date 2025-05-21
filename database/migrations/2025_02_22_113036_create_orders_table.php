@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('variant_id')->constrained('product_variants')->onDelete('cascade'); // الـ Variant المطلوب
             $table->integer('quantity')->default(1); // الكمية المطلوبة
             $table->decimal('total_price', 10, 2); // السعر الإجمالي للطلب
+            $table->string('discount_amount')->nullable(); // مبلغ الخصم
             $table->string('status')->default('pending'); // حالة الطلب (pending, completed, cancelled)
             $table->timestamps();
         });
