@@ -35,6 +35,10 @@ class UserResource extends Resource
                     ->label('الاسم')
                     ->required()
                     ->maxLength(255),
+                TextInput::make('last_name')
+                    ->label('اسم العائلة')
+                    ->required()
+                    ->maxLength(255),
                 TextInput::make('email')
                     ->label('البريد الإلكتروني')
                     ->required()
@@ -51,6 +55,8 @@ class UserResource extends Resource
                 TextInput::make('password')
                     ->label('كلمة السر')
                     ->maxLength(255)
+                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
+                    ->dehydrated(fn($state) => !empty($state))
                     ->nullable(),
                 TextInput::make('created_at')
                     ->label('تاريخ الإنشاء')
